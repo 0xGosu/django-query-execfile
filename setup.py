@@ -14,12 +14,12 @@ import query_execfile
 setup(
 	name='django-query-execfile',
 	version=query_execfile.__version__,
-	description='Description',
+	description='A Django module for execute custom sql query in a .sql file',
 	author='V.Anh Tran',
 	author_email='tranvietanh1991@gmail.com',
 	license="MIT",
-	url='https://github.com/tranvietanh1991/mypackage',  # use the URL to the github repo
-	download_url='https://github.com/tranvietanh1991/mypackage/tarball/0.1',  # source code download
+	url='https://github.com/tranvietanh1991/django-query-execfile',  # use the URL to the github repo
+	download_url='https://github.com/tranvietanh1991/django-query-execfile/archive/master.zip',  # source code download
 	packages=find_packages(exclude=['*.tests', '*.tests.*']),
 	include_package_data=True,
 	install_requires=[
@@ -32,7 +32,7 @@ setup(
 		"Framework :: Django",
 		"Intended Audience :: Developers",
 		"Intended Audience :: System Administrators",
-		"License :: OSI Approved :: The MIT License (MIT)",
+		"License :: OSI Approved :: MIT License",
 		"Operating System :: OS Independent",
 		"Programming Language :: Python :: 2",
 		# "Programming Language :: Python :: 3",
