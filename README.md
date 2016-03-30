@@ -34,7 +34,7 @@ pip install django-query-execfile
 
 This is content of a .sql file
 
-```mysql
+```sql
 #sum_customerPayment_amount_rate_exchanged_group_by_day
 SELECT
   DATE(customerPayment.created)                       AS created,
