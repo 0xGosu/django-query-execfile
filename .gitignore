@@ -60,3 +60,13 @@ target/
 
 #Ipython Notebook
 .ipynb_checkpoints
+
+# Pycharm
+**/.idea/
+.idea/
+**/.DS_Store
+*.DS_Store
+.DS_Store
+
+# pip
+src/
