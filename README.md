@@ -49,14 +49,19 @@ GROUP BY DATE(customerPayment.created);
 Usage example
 
 ```python
-from query_execfile import sql_execfile
+from models import Order
+from query_execfile import sql_execfile, raw_queryfile
 
-sql_execfile(cursor,
-    '../datagrip/payment_transaction_stats.sql'),
-    {'from_date': .., 'to_date': ..},
+result = sql_execfile('../datagrip/payment_transaction_stats.sql'),
+    params={'from_date': .., 'to_date': ..},
     mapResultToDict=True,
     includeDescription=True
 )
+print result
+
+rawQuerySet = raw_queryfile(Order, '../datagrip/order_rawquery.sql')
+for order in rawQuerySet:
+    doSomeThingWith(order)
 ```
 
 **mapResultToDict=True** will map results to a dict with key = first comment above the query.
@@ -94,4 +99,3 @@ In this case is _AS created_ and _AS amount_exchanged_
 
 
 # Documentation & Support
-
