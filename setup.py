@@ -9,11 +9,12 @@
 #
 
 from setuptools import setup, find_packages
-import query_execfile
+
+__version__ = '0.4'
 
 setup(
 	name='django-query-execfile',
-	version=query_execfile.__version__,
+	version=__version__,
 	description='A Django module for execute custom sql query in a .sql file',
 	author='V.Anh Tran',
 	author_email='tranvietanh1991@gmail.com',
