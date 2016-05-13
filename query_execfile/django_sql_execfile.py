@@ -78,7 +78,7 @@ def sql_execfile(filePath, cursor=None, using=None, params=None, runSQLPattern=N
 			if runSQLPattern and re.search(runSQLPattern, sql_cmd, re.I) == None:
 				continue;
 			#escape % in DATEFORMAT
-			sql_cmd = re.sub(r'%[^s(]', r'%\0', sql_cmd);
+			sql_cmd = re.sub(r'(%[^s(])', r'%\1', sql_cmd);
 			param = params[i] if i < len(params) else params[-1]
 			cursor.execute(sql_cmd, param)
 			raw_result = []
