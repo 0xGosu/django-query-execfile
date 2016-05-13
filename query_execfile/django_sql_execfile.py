@@ -71,11 +71,14 @@ def sql_execfile(filePath, cursor=None, using=None, params=None, runSQLPattern=N
 	if not isinstance(params, list):
 		params = [params]  # convert params to list when it is non list obj
 
+	success_command = 0;
 	try:
 		for i in range(len(sql_commands)):
 			sql_cmd = sql_commands[i]
 			if runSQLPattern and re.search(runSQLPattern, sql_cmd, re.I) == None:
 				continue;
+			#escape % in DATEFORMAT
+			sql_cmd = re.sub(r'%[^s(]', r'%\0', sql_cmd);
 			param = params[i] if i < len(params) else params[-1]
 			cursor.execute(sql_cmd, param)
 			raw_result = []
@@ -91,6 +94,7 @@ def sql_execfile(filePath, cursor=None, using=None, params=None, runSQLPattern=N
 					resultDict['QUERY_%s' % i] = raw_result;
 			else:
 				resultList.append(raw_result)
+			success_command+=1;
 	except Exception as e:
 		cursor.close();
 		raise e;
@@ -101,5 +105,5 @@ def sql_execfile(filePath, cursor=None, using=None, params=None, runSQLPattern=N
 	if mapResultToDict:
 		return resultDict
 
-	if len(sql_commands) == 1 and len(resultList) == 1: return resultList[0]
+	if success_command == 1 and len(resultList) == 1: return resultList[0]
 	return resultList
