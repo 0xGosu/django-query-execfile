@@ -35,7 +35,8 @@ def raw_queryfile(ORMClass, filePath, params=None, translations=None, using=None
 	return ORMClass.objects.raw(sql_file_content, params=params, translations=translations, using=using)
 
 
-def sql_execfile(filePath, cursor=None, using=None, params=None, runSQLPattern=None, mapResultToDict=False, includeDescription=False):
+def sql_execfile(filePath, cursor=None, using=None, params=None, runSQLPattern=None, mapResultToDict=False,
+				 includeDescription=False, mapDescriptionToField=False):
 	""" Execute sql command defined in a .sql file
 
 	:param cursor: connection.cursor()
@@ -77,14 +78,25 @@ def sql_execfile(filePath, cursor=None, using=None, params=None, runSQLPattern=N
 			sql_cmd = sql_commands[i]
 			if runSQLPattern and re.search(runSQLPattern, sql_cmd, re.I) == None:
 				continue;
-			#escape % in DATEFORMAT
+			# escape % in DATEFORMAT
 			sql_cmd = re.sub(r'(%[^s(])', r'%\1', sql_cmd);
 			param = params[i] if i < len(params) else params[-1]
 			cursor.execute(sql_cmd, param)
 			raw_result = []
+
 			if includeDescription:
-				raw_result.append([d[0] for d in cursor.description]);
-			raw_result.extend(cursor.fetchall())
+				desc_row = [d[0] for d in cursor.description]
+				if mapDescriptionToField:
+					for row in cursor.fetchall():
+						row_dict = {}
+						for i in range(len(row)):
+							row_dict[desc_row[i]] = row[i]
+						raw_result.append(row_dict)
+				else:
+					raw_result.append(desc_row);
+					raw_result.extend(cursor.fetchall())
+			else:
+				raw_result.extend(cursor.fetchall())
 
 			if mapResultToDict:
 				m = re.search(r'^#(\w+)', sql_cmd.strip());
@@ -94,7 +106,7 @@ def sql_execfile(filePath, cursor=None, using=None, params=None, runSQLPattern=N
 					resultDict['QUERY_%s' % i] = raw_result;
 			else:
 				resultList.append(raw_result)
-			success_command+=1;
+			success_command += 1;
 	except Exception as e:
 		cursor.close();
 		raise e;
@@ -103,6 +115,7 @@ def sql_execfile(filePath, cursor=None, using=None, params=None, runSQLPattern=N
 			cursor.close();
 
 	if mapResultToDict:
+		if success_command == 1 and len(resultDict) == 1: return resultDict[resultDict.keys()[0]]
 		return resultDict
 
 	if success_command == 1 and len(resultList) == 1: return resultList[0]
