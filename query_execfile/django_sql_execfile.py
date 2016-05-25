@@ -73,46 +73,47 @@ def sql_execfile(filePath, cursor=None, using=None, params=None, runSQLPattern=N
 		params = [params]  # convert params to list when it is non list obj
 
 	success_command = 0;
-	try:
-		for i in range(len(sql_commands)):
-			sql_cmd = sql_commands[i]
-			if runSQLPattern and re.search(runSQLPattern, sql_cmd, re.I) == None:
-				continue;
-			# escape % in DATEFORMAT
-			sql_cmd = re.sub(r'(%[^s(])', r'%\1', sql_cmd);
-			param = params[i] if i < len(params) else params[-1]
+
+	for i in range(len(sql_commands)):
+		sql_cmd = sql_commands[i]
+		if runSQLPattern and re.search(runSQLPattern, sql_cmd, re.I) == None:
+			continue;
+		# escape % in DATEFORMAT
+		sql_cmd = re.sub(r'(%[^s(])', r'%\1', sql_cmd);
+		param = params[i] if i < len(params) else params[-1]
+		try:
 			cursor.execute(sql_cmd, param)
-			raw_result = []
-
-			if includeDescription:
-				desc_row = [d[0] for d in cursor.description]
-				if mapDescriptionToField:
-					for row in cursor.fetchall():
-						row_dict = {}
-						for i in range(len(row)):
-							row_dict[desc_row[i]] = row[i]
-						raw_result.append(row_dict)
-				else:
-					raw_result.append(desc_row);
-					raw_result.extend(cursor.fetchall())
-			else:
-				raw_result.extend(cursor.fetchall())
-
-			if mapResultToDict:
-				m = re.search(r'^#(\w+)', sql_cmd.strip());
-				if m:
-					resultDict[m.group(1)] = raw_result
-				else:
-					resultDict['QUERY_%s' % i] = raw_result;
-			else:
-				resultList.append(raw_result)
-			success_command += 1;
-	except Exception as e:
-		cursor.close();
-		raise e;
-	else:
-		if close_cursor_when_done:
+		except Exception as e:
 			cursor.close();
+			raise e;
+		raw_result = []
+
+		if includeDescription:
+			desc_row = [d[0] for d in cursor.description]
+			if mapDescriptionToField:
+				for row in cursor.fetchall():
+					row_dict = {}
+					for i in range(len(row)):
+						row_dict[desc_row[i]] = row[i]
+					raw_result.append(row_dict)
+			else:
+				raw_result.append(desc_row);
+				raw_result.extend(cursor.fetchall())
+		else:
+			raw_result.extend(cursor.fetchall())
+
+		if mapResultToDict:
+			m = re.search(r'^#(\w+)', sql_cmd.strip());
+			if m:
+				resultDict[m.group(1)] = raw_result
+			else:
+				resultDict['QUERY_%s' % i] = raw_result;
+		else:
+			resultList.append(raw_result)
+		success_command += 1;
+
+	if close_cursor_when_done:
+		cursor.close();
 
 	if mapResultToDict:
 		if success_command == 1 and len(resultDict) == 1: return resultDict[resultDict.keys()[0]]
